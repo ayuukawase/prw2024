@@ -1,57 +1,73 @@
 <?php
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nome = $_POST["nome"];
-    $idade = intval($_POST["idade"]);
-    $salario = floatval($_POST["salario"]);
-
-    function calcularDescontoINSS($salarioBruto) {
-        // Tabela de alíquotas do INSS
-        $faixasINSS = [
-            1302 => 0.075,
-            2571.29 => 0.09,
-            3856.94 => 0.12,
-            7507.49 => 0.14
-        ];
-    $descontoINSS = calcularDescontoINSS($salario);
-
-        // Encontre a faixa salarial correspondente
-        foreach ($faixasINSS as $limite => $aliquota) {
-            if ($salarioBruto <= $limite) {
-                $descontoINSS = $salarioBruto * $aliquota;
-                break;
-            }
+    $nome = $_GET['nome'];
+    $idade = $_GET['idade'];
+    $salario = $_GET['salario'];
+    
+    if($idade <= 65)
+    {
+        //---calculo inss---
+        if($salario <= 1412)
+        {
+            $taxaINSS = ($salario/100)*7.5;
         }
-        return $descontoINSS;
+        else if($salario >= 1412.01 && $salario <= 2666.68)
+        {
+            $taxaINSS = ($salario/100)*9;
+        }
+        else if($salario >= 2666.69 && $salario <= 4000.03)
+        {
+            $taxaINSS = ($salario/100)*12;
+        }
+        else if($salario >= 4000.04 && $salario <= 7786.02)
+        {
+            $taxaINSS = ($salario/100)*14;
+        }
+
+        //Salario descontado do INSS
+        $salario = $salario - $taxaINSS;
     }
 
-        function calcularDescontoIRPF($salarioBruto) {
-            // Tabela de alíquotas do IRPF
-            // (Valores fictícios apenas para demonstração)
-            $faixasIRPF = [
-                2000 => 0.1,
-                4000 => 0.15,
-                6000 => 0.2,
-                10000 => 0.25
-            ];
-    $descontoIRPF = calcularDescontoIRPF($salario, $idade);
-
-        // Encontre a faixa salarial correspondente
-        foreach ($faixasIRPF as $limite => $aliquota) {
-            if ($salarioBruto <= $limite) {
-                $descontoIRPF = $salarioBruto * $aliquota;
-                break;
-            }
+    if($idade <= 65)
+    {
+        //---calculo irpf---
+        if($salario >= 2112.01 && $salario <= 2826.65)
+        {
+            $taxaIRPF = ($salario/100)*7.5;
         }
-        return $descontoIRPF;
+        else if($salario >= 2826.66 && $salario <= 3751.05)
+        {
+            $taxaIRPF = ($salario/100)*15;
+        }
+        else if($salario >= 3751.06 && $salario <= 4664.68)
+        {
+            $taxaIRPF = ($salario/100)*22.5;
+        }
+        else if($salario > 4664.68)
+        {
+            $taxaIRPF = ($salario/100)*27.5;
+        }
     }
-
-    // Salário líquido
-    $salarioLiquido = $salario - ($descontoINSS + $descontoIRPF);
-
-    echo "<h2>Resultados para $nome:</h2>";
-    echo "Desconto do INSS: R$ " . number_format($descontoINSS, 2, ',', '.') . "<br>";
-    echo "Desconto do IRPF: R$ " . number_format($descontoIRPF, 2, ',', '.') . "<br>";
-    echo "Salário Líquido: R$ " . number_format($salarioLiquido, 2, ',', '.');
-}
-
+    else
+    {
+        if($salario >= 2112.01 && $salario <= 2826.65)
+        {
+            $taxaIRPF = ($salario/100)*7.5;
+        }
+        else if($salario >= 2826.66 && $salario <= 3751.05)
+        {
+            $taxaIRPF = ($salario/100)*15;
+        }
+        else if($salario >= 3751.06 && $salario <= 4664.68)
+        {
+            $taxaIRPF = ($salario/100)*15;
+        }
+        else if($salario > 4664.68)
+        {
+            $taxaIRPF = ($salario/100)*15;
+        }
+    }
+    
+    $salario = $salario - $taxaIRPF;
+    echo "Sálario Lido: R$".$salario+$taxaINSS+$taxaIRPF, PHP_EOL;
+    echo "Sálario Restante: R$".$salario. " / Imposto Total: R$".$taxaINSS+$taxaIRPF;
 ?>
